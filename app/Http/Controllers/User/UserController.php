@@ -4,36 +4,28 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Services\CategoryService;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function getAllDatas(Request $request) {
-        $data = Category::orderBy('id', 'desc')->paginate($request->per_page);
+    public $categoryService;
 
-        return response()->json([
-            'success' => true,
-            'status' => 200,
-            'categories' => $data
-        ]);
+    public function __construct(CategoryService $categoryService)
+    {
+        $this->categoryService = $categoryService;
+    }
+    
+    public function getAllDatas(Request $request) {
+        return $this->categoryService->getAll($request);
     }
 
     public function postData(Request $request) {
-        $save = new Category();
-        $save->name = $request->name;
-        $save->icon = $request->icon;
-        $save->save();
-
-        return $save;
+        return $this->categoryService->postData($request);
     }
 
     public function updateData(Request $request, $id) {
-        $update = Category::find($id);
-        $update->name = $request->name;
-        $update->icon = $request->icon;
-        $update->save();
-
-        return $update;
+        return $this->categoryService->updateData($request, $id);
     }
 
     public function deleteData($id) {
